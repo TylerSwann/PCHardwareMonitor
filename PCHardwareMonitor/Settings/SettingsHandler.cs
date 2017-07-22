@@ -73,22 +73,18 @@ namespace PCHardwareMonitor
 
         private void CheckForSettingsFile()
         {
-            if (File.Exists($"{AppDirectory.rootDirectory}/user.json") == false)
+
+            if(File.Exists($"{AppDirectory.rootDirectory}/user.json"))
             {
-                var defaults = UserSettings.defaults;
-                this.settings = defaults;
+                try { this.settings = UserSettings.LoadFromFile(AppDirectory.defaultSettings); }
+                catch (System.Exception ex) { Console.WriteLine(ex); }
             }
             else
             {
-                var saveSettings = UserSettings.LoadFromFile($"{AppDirectory.rootDirectory}/user.json");
-                if (saveSettings == null)
-                {
-                    var defaults = UserSettings.defaults;
-                    this.settings = defaults;
-                    return;
-                }
-                settings = saveSettings;
+                try { this.settings = UserSettings.LoadFromFile(AppDirectory.defaultSettings); }
+                catch (System.Exception ex) { Console.WriteLine(ex); }
             }
+            if (this.settings == null) { Console.WriteLine("SETTINGS ARE NULL"); }
         }
 
         private void CurrentSettingDidChange(int index)
@@ -112,8 +108,8 @@ namespace PCHardwareMonitor
             MessageBoxResult result = MessageBox.Show("Are you sure you want to reset the colors?", "Confirm", MessageBoxButton.YesNo);
             if (result == MessageBoxResult.Yes)
             {
-                var defaults = UserSettings.defaults;
-                this.settings = defaults;
+                try { this.settings = UserSettings.LoadFromFile(AppDirectory.defaultSettings); }
+                catch (System.Exception ex) { Console.WriteLine(ex); }
                 this.Delegate.ResetSettings();
             }
         }

@@ -91,6 +91,7 @@
     <Compile Include="VitalIndicator.cs" />
     <Compile Include="VitalMonitor.cs" />
     <Compile Include="WindowBlur.cs" />
+    <Compile Include="WindowManager.cs" />
     <Compile Include="WindowPositioner.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -20,7 +20,7 @@ namespace PCHardwareMonitor
         private List<BorderedVitalIndicator> borderedIndicators = new List<BorderedVitalIndicator>();
         private VitalMonitor monitor = new VitalMonitor();
         private List<Window> windows = new List<Window>();
-        private WindowPosition currentPosition = WindowPosition.right;
+        private LayoutPosition currentPosition = LayoutPosition.Center;
         private Vital[] vitals = new Vital[] { Vital.cpuLoad, Vital.ramLoad,
                                                Vital.gpuLoad, Vital.gpuMemoryLoad,
                                                Vital.gpuTemp, Vital.gpuFanSpeed, Vital.driveSpace };
@@ -133,22 +133,31 @@ namespace PCHardwareMonitor
             return window;
         }
 
-        private void SetPosition(WindowPosition position)
+        private void SetPosition(LayoutPosition position)
         {
-            switch (position)
+            switch(position)
             {
-                case WindowPosition.top:
-                    WindowPositioner.PositionToTop(this.parent);
-                    WindowPositioner.StackWindowsToTop(windows.ToArray()); break;
-                case WindowPosition.bottom:
-                    WindowPositioner.PositionToBottom(this.parent);
-                    WindowPositioner.StackWindowsToBottom(windows.ToArray()); break;
-                case WindowPosition.right:
+                case LayoutPosition.TopRight:
+                    WindowPositioner.StackWindowsToTopRight(this.windows.ToArray());
                     WindowPositioner.PositionToRight(this.parent);
-                    WindowPositioner.StackWindowsToRight(windows.ToArray()); break;
-                case WindowPosition.left:
+                    break;
+                case LayoutPosition.TopLeft:
+                    WindowPositioner.StackWindowsToTopLeft(this.windows.ToArray());
                     WindowPositioner.PositionToLeft(this.parent);
-                    WindowPositioner.StackWindowsToLeft(windows.ToArray()); break;
+                    break;
+                case LayoutPosition.BottomRight:
+                    WindowPositioner.StackWindowsToBottomRight(this.windows.ToArray());
+                    WindowPositioner.PositionToRight(this.parent);
+                    break;
+                case LayoutPosition.BottomLeft:
+                    WindowPositioner.StackWindowsToBottomLeft(this.windows.ToArray());
+                    WindowPositioner.PositionToLeft(this.parent);
+                    break;
+                case LayoutPosition.Center:
+                    WindowPositioner.StackWindowsToCenter(this.windows.ToArray());
+                    WindowPositioner.PositionToCenter(this.parent);
+                    break;
+                default: break;
             }
         }
 
@@ -158,17 +167,18 @@ namespace PCHardwareMonitor
             button.onClick = () => { };
             switch (currentPosition)
             {
-                case WindowPosition.right:
+                case LayoutPosition.TopRight:
                     button.Margin = new Thickness(0, 100, 60, 0);
                     button.HorizontalAlignment = HorizontalAlignment.Left;
                     button.VerticalAlignment = VerticalAlignment.Top;
                     break;
-                case WindowPosition.left:
+                case LayoutPosition.TopLeft:
                     button.Margin = new Thickness(60, 100, 0, 0);
                     button.HorizontalAlignment = HorizontalAlignment.Right;
                     button.VerticalAlignment = VerticalAlignment.Top;
                     break;
-                case WindowPosition.top:
+                default: break;
+                /*case WindowPosition.top:
                     button.Margin = new Thickness(60, 100, 0, 0);
                     button.HorizontalAlignment = HorizontalAlignment.Left;
                     button.VerticalAlignment = VerticalAlignment.Top;
@@ -177,10 +187,8 @@ namespace PCHardwareMonitor
                     button.Margin = new Thickness(60, 0, 0, 100);
                     button.HorizontalAlignment = HorizontalAlignment.Left;
                     button.VerticalAlignment = VerticalAlignment.Bottom;
-                    break;
+                    break;*/
             }
-            button.HorizontalAlignment = HorizontalAlignment.Left;
-            button.VerticalAlignment = VerticalAlignment.Top;
             button.CornerRadius = new CornerRadius(5);
             button.Opacity = 0.0;
             button.onClick = () => { ShowSettingsWindow(); };
@@ -228,7 +236,9 @@ namespace PCHardwareMonitor
         }
         public void DidSelectNewPosition(LayoutPosition position)
         {
-
+            foreach (var window in windows) { window.Opacity = 0.0; }
+            SetPosition(position);
+            foreach (var window in windows) { window.Opacity = 1.0; }
         }
 
         public void DidSelectNewVital(HardwareVital vital)

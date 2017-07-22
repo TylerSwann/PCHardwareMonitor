@@ -16,16 +16,16 @@ namespace PCHardwareMonitor
         private Grid root;
         private double indicatorHeight = 40.0;
         private double indicatorWidth = 280.0;
+        private HoverButton settingsButton;
         private SolidColorBrush windowColor = new SolidColorBrush(Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255));
         private List<BorderedVitalIndicator> borderedIndicators = new List<BorderedVitalIndicator>();
         private VitalMonitor monitor = new VitalMonitor();
         private List<Window> windows = new List<Window>();
-        private LayoutPosition currentPosition = LayoutPosition.Center;
+        private LayoutPosition currentPosition;
         private Vital[] vitals = new Vital[] { Vital.cpuLoad, Vital.ramLoad,
                                                Vital.gpuLoad, Vital.gpuMemoryLoad,
                                                Vital.gpuTemp, Vital.gpuFanSpeed, Vital.driveSpace };
         private HardwareVital[] vitalsToMonitor;
-        private LayoutPosition position;
 
         public WindowManager(UserSettings settings, Window parent, Grid root)
         {
@@ -37,6 +37,7 @@ namespace PCHardwareMonitor
         public void Open()
         {
             SetupIndicators(() => {
+                ApplySettings();
                 SetPosition(currentPosition);
                 ApplySettings();
                 ShowWindows();
@@ -49,7 +50,7 @@ namespace PCHardwareMonitor
             if (settings != null)
             {
                 this.vitalsToMonitor = settings.startupVitals;
-                this.position = settings.startupPosition;
+                this.currentPosition = settings.startupPosition;
                 foreach (var window in windows) { window.Background = new SolidColorBrush(settings.windowBackgroundColor); }
                 foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.indicator.SetBarBackgroundColor(settings.barBackgroundColor); }
                 foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.indicator.SetBarForegroundColor(settings.barForegroundColor); }
@@ -159,42 +160,52 @@ namespace PCHardwareMonitor
                     break;
                 default: break;
             }
+            if (settingsButton != null) { SetSettingsButtonPosition(position); }
         }
 
         private void AddSettingsButton()
         {
-            var button = new HoverButton(30.0, 30.0);
-            button.onClick = () => { };
-            switch (currentPosition)
+            settingsButton = new HoverButton(30.0, 30.0);
+            SetSettingsButtonPosition(currentPosition);
+            settingsButton.CornerRadius = new CornerRadius(5);
+            settingsButton.Opacity = 0.0;
+            settingsButton.onClick = () => { ShowSettingsWindow(); };
+            this.parent.MouseLeave += (object sender, MouseEventArgs e) => { settingsButton.SetHidden(); };
+            this.parent.MouseEnter += (object sender, MouseEventArgs e) => { settingsButton.SetVisible(); };
+            root.Children.Add(settingsButton);
+        }
+
+        private void SetSettingsButtonPosition(LayoutPosition position)
+        {
+            switch (position)
             {
                 case LayoutPosition.TopRight:
-                    button.Margin = new Thickness(0, 100, 60, 0);
-                    button.HorizontalAlignment = HorizontalAlignment.Left;
-                    button.VerticalAlignment = VerticalAlignment.Top;
+                    settingsButton.Margin = new Thickness(0, 100, 60, 0);
+                    settingsButton.HorizontalAlignment = HorizontalAlignment.Left;
+                    settingsButton.VerticalAlignment = VerticalAlignment.Top;
                     break;
                 case LayoutPosition.TopLeft:
-                    button.Margin = new Thickness(60, 100, 0, 0);
-                    button.HorizontalAlignment = HorizontalAlignment.Right;
-                    button.VerticalAlignment = VerticalAlignment.Top;
+                    settingsButton.Margin = new Thickness(60, 100, 0, 0);
+                    settingsButton.HorizontalAlignment = HorizontalAlignment.Right;
+                    settingsButton.VerticalAlignment = VerticalAlignment.Top;
+                    break;
+                case LayoutPosition.BottomRight:
+                    settingsButton.Margin = new Thickness(0, 0, 60, 100);
+                    settingsButton.HorizontalAlignment = HorizontalAlignment.Left;
+                    settingsButton.VerticalAlignment = VerticalAlignment.Bottom;
+                    break;
+                case LayoutPosition.BottomLeft:
+                    settingsButton.Margin = new Thickness(60, 0, 0, 100);
+                    settingsButton.HorizontalAlignment = HorizontalAlignment.Right;
+                    settingsButton.VerticalAlignment = VerticalAlignment.Bottom;
+                    break;
+                case LayoutPosition.Center:
+                    settingsButton.Margin = new Thickness(60, 0, 0, 100);
+                    settingsButton.HorizontalAlignment = HorizontalAlignment.Right;
+                    settingsButton.VerticalAlignment = VerticalAlignment.Center;
                     break;
                 default: break;
-                /*case WindowPosition.top:
-                    button.Margin = new Thickness(60, 100, 0, 0);
-                    button.HorizontalAlignment = HorizontalAlignment.Left;
-                    button.VerticalAlignment = VerticalAlignment.Top;
-                    break;
-                case WindowPosition.bottom:
-                    button.Margin = new Thickness(60, 0, 0, 100);
-                    button.HorizontalAlignment = HorizontalAlignment.Left;
-                    button.VerticalAlignment = VerticalAlignment.Bottom;
-                    break;*/
             }
-            button.CornerRadius = new CornerRadius(5);
-            button.Opacity = 0.0;
-            button.onClick = () => { ShowSettingsWindow(); };
-            this.parent.MouseLeave += (object sender, MouseEventArgs e) => { button.SetHidden(); };
-            this.parent.MouseEnter += (object sender, MouseEventArgs e) => { button.SetVisible(); };
-            root.Children.Add(button);
         }
 
         private void ShowSettingsWindow()

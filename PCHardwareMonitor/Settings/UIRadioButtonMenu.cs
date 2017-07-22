@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 namespace PCHardwareMonitor
 {
@@ -46,6 +42,7 @@ namespace PCHardwareMonitor
         public void SetButtonSelected(int index, bool selected)
         {
             if (index > buttons.Count - 1 || index < 0) { Console.WriteLine("INDEX OUT OF RANGE"); return; }
+            foreach (var button in buttons) { if (button != buttons[index]) { button.SetSelected(false); } }
             buttons[index].SetSelected(selected);
         }
     }

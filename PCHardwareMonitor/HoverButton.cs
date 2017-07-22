@@ -15,6 +15,7 @@ namespace PCHardwareMonitor
         private Color idleColor;
         private Color hoverColor;
         private Color clickColor;
+        private bool isBeingSetHidden = false;
 
         public HoverButton(double width, double height)
         {
@@ -24,12 +25,12 @@ namespace PCHardwareMonitor
             this.hoverColor = Color.FromRgb((byte)90, (byte)90, (byte)90);
             this.clickColor = Color.FromRgb((byte)120, (byte)120, (byte)120);
             this.Background = new SolidColorBrush(idleColor);
-            this.MouseLeave += (object sender, MouseEventArgs e) => { this.Background = new SolidColorBrush(idleColor); };
-            this.MouseEnter += (object sender, MouseEventArgs e) => { this.Background = new SolidColorBrush(hoverColor); };
-            this.MouseLeftButtonUp += (object sender, MouseButtonEventArgs e) => { this.Background = new SolidColorBrush(hoverColor); };
+           // this.MouseLeave += (object sender, MouseEventArgs e) => { this.Background = new SolidColorBrush(idleColor); };
+            //this.MouseEnter += (object sender, MouseEventArgs e) => { this.Background = new SolidColorBrush(hoverColor); };
+            //this.MouseLeftButtonUp += (object sender, MouseButtonEventArgs e) => { this.Background = new SolidColorBrush(hoverColor); };
             this.MouseLeftButtonDown += (object sender, MouseButtonEventArgs e) => {
-                this.Background = new SolidColorBrush(clickColor);
-                if (onClick != null) { onClick(); }
+                //this.Background = new SolidColorBrush(clickColor);
+                onClick?.Invoke();
             };
         }
         public void SetHoverColor(Color color) { this.hoverColor = color; }
@@ -38,7 +39,11 @@ namespace PCHardwareMonitor
 
         public void SetHidden()
         {
-            if (this.Opacity != 1.0) { return; }
+            return;
+            isBeingSetHidden = true;
+            System.Threading.Thread.Sleep(2000);
+            if (isBeingSetHidden) { this.Opacity = 0.0; }
+            /*if (this.Opacity != 1.0) { return; }
             var fadeAnimation = new DoubleAnimation
             {
                 To = 0.0,
@@ -47,11 +52,14 @@ namespace PCHardwareMonitor
                 FillBehavior = FillBehavior.Stop
             };
             fadeAnimation.Completed += (s, a) => this.Opacity = 0.0;
-            this.BeginAnimation(OpacityProperty, fadeAnimation);
+            this.BeginAnimation(OpacityProperty, fadeAnimation);*/
         }
         public void SetVisible()
         {
-            if (this.Opacity != 0.0) { return; }
+
+            //isBeingSetHidden = false;
+            this.Opacity = 1.0;
+            /*if (this.Opacity != 0.0) { return; }
             var fadeAnimation = new DoubleAnimation
             {
                 To = 1.0,
@@ -60,7 +68,37 @@ namespace PCHardwareMonitor
                 FillBehavior = FillBehavior.Stop
             };
             fadeAnimation.Completed += (s, a) => this.Opacity = 1.0;
-            this.BeginAnimation(OpacityProperty, fadeAnimation);
+            this.BeginAnimation(OpacityProperty, fadeAnimation);*/
+        }
+
+        private void PlayOpacityAnimation(Action completion)
+        {
+            var fadeInAnimation = new DoubleAnimation
+            {
+                To = 1.0,
+                BeginTime = TimeSpan.FromSeconds(0.0),
+                Duration = TimeSpan.FromSeconds(0.05),
+                FillBehavior = FillBehavior.Stop
+            };
+            fadeInAnimation.Completed += (s, a) =>
+            {
+                this.Opacity = 1.0;
+                completion();
+            };
+
+            var fadeOutAnimation = new DoubleAnimation
+            {
+                To = 0.5,
+                BeginTime = TimeSpan.FromSeconds(0.0),
+                Duration = TimeSpan.FromSeconds(0.05),
+                FillBehavior = FillBehavior.Stop
+            };
+            fadeOutAnimation.Completed += (s, a) =>
+            {
+                this.Opacity = 0.5;
+                this.BeginAnimation(OpacityProperty, fadeInAnimation);
+            };
+            this.BeginAnimation(OpacityProperty, fadeOutAnimation);
         }
     }
 }

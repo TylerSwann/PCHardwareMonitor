@@ -43,6 +43,14 @@ namespace PCHardwareMonitor
             positionMenu = new UIRadioButtonMenu(positionTitles, 290.0, 380.0);
             positionMenu.Visibility = Visibility.Hidden;
             positionMenu.didSelectedIndex = (int i) => { NewPositionWasSelected((LayoutPosition)i); };
+            switch (settings.startupPosition)
+            {
+                case (LayoutPosition)0: positionMenu.SetButtonSelected(0, true); break;
+                case (LayoutPosition)1: positionMenu.SetButtonSelected(1, true); break;
+                case (LayoutPosition)2: positionMenu.SetButtonSelected(2, true); break;
+                case (LayoutPosition)3: positionMenu.SetButtonSelected(3, true); break;
+                case (LayoutPosition)4: positionMenu.SetButtonSelected(4, true); break;
+            }
             settingsPanel.Children.Add(positionMenu);
             settingsPanel.rightPanel.Children.Add(hardwareMenu);
             settingsPanel.colorCanvas.Visibility = Visibility.Hidden;
@@ -76,7 +84,7 @@ namespace PCHardwareMonitor
 
             if(File.Exists($"{AppDirectory.rootDirectory}/user.json"))
             {
-                try { this.settings = UserSettings.LoadFromFile(AppDirectory.defaultSettings); }
+                try { this.settings = UserSettings.LoadFromFile(AppDirectory.userSettings); }
                 catch (System.Exception ex) { Console.WriteLine(ex); }
             }
             else
@@ -166,6 +174,14 @@ namespace PCHardwareMonitor
 
         private void ShowRadioButtonMenu()
         {
+            switch(settings.startupPosition)
+            {
+                case (LayoutPosition)0: positionMenu.SetButtonSelected(0, true); break;
+                case (LayoutPosition)1: positionMenu.SetButtonSelected(1, true); break;
+                case (LayoutPosition)2: positionMenu.SetButtonSelected(2, true); break;
+                case (LayoutPosition)3: positionMenu.SetButtonSelected(3, true); break;
+                case (LayoutPosition)4: positionMenu.SetButtonSelected(4, true); break;
+            }
             settingsPanel.colorCanvas.Visibility = Visibility.Hidden;
             hardwareMenu.Visibility = Visibility.Hidden;
             positionMenu.Visibility = Visibility.Visible;

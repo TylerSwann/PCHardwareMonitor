@@ -64,51 +64,53 @@ namespace PCHardwareMonitor
 
         private void SetupIndicators(Action completion)
         {
-            foreach (var vital in vitalsToMonitor)
-            {
-                VitalIndicator indicator;
-                switch (vital)
-                {
-                    case Vital.CPUUsage:
-                        indicator = new VitalIndicator($"{VitalMonitor.GetCPUName()} Load ", this.indicatorWidth, this.indicatorHeight);
-                        monitor.ListenToCPUUsage(indicator);
-                        break;
-                    case Vital.RAMUsage:
-                        indicator = new VitalIndicator("RAM Load ", this.indicatorWidth, this.indicatorHeight);
-                        monitor.ListenToRAMUsage(indicator);
-                        break;
-                    case Vital.CPUCoreUsage: /*SetupCPUCoreIndicators();*/ return;
-                    case Vital.GPUUsage:
-                        indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Load ", this.indicatorWidth, this.indicatorHeight);
-                        monitor.ListenToGPULoad(indicator);
-                        break;
-                    case Vital.GPUMemoryUsage:
-                        indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Memory ", this.indicatorWidth, this.indicatorHeight);
-                        monitor.ListenToGPUMemoryLoad(indicator);
-                        break;
-                    case Vital.GPUFanRPM:
-                        indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Fan ", this.indicatorWidth, this.indicatorHeight);
-                        monitor.ListenToGPUFanSpeed(indicator);
-                        break;
-                    case Vital.GPUTemp:
-                        indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Temp ", this.indicatorWidth, this.indicatorHeight);
-                        monitor.ListenToGPUTemp(indicator);
-                        break;
-                    case Vital.HarddriveSpace:
-                        var drives = DriveInfo.GetDrives();
-                        for (int i = 0; i < drives.Count(); i++)
-                        {
-                            var drive = drives[i];
-                            var driveIndicator = new VitalIndicator($"{drive.Name} ", this.indicatorWidth, this.indicatorHeight);
-                            monitor.ListenToDrive(driveIndicator, drive);
-                            AddIndicatorWindow(driveIndicator, vital);
-                        }
-                        continue;
-                    default: continue;
-                }
-                AddIndicatorWindow(indicator, vital);
-            }
+            foreach (var vital in vitalsToMonitor) { AddNewIndicator(vital); }
             completion();
+        }
+
+        private void AddNewIndicator(Vital monitoringVital)
+        {
+            VitalIndicator indicator;
+            switch (monitoringVital)
+            {
+                case Vital.CPUUsage:
+                    indicator = new VitalIndicator($"{VitalMonitor.GetCPUName()} Load ", this.indicatorWidth, this.indicatorHeight);
+                    monitor.ListenToCPUUsage(indicator);
+                    break;
+                case Vital.RAMUsage:
+                    indicator = new VitalIndicator("RAM Load ", this.indicatorWidth, this.indicatorHeight);
+                    monitor.ListenToRAMUsage(indicator);
+                    break;
+                case Vital.CPUCoreUsage: /*SetupCPUCoreIndicators();*/ return;
+                case Vital.GPUUsage:
+                    indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Load ", this.indicatorWidth, this.indicatorHeight);
+                    monitor.ListenToGPULoad(indicator);
+                    break;
+                case Vital.GPUMemoryUsage:
+                    indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Memory ", this.indicatorWidth, this.indicatorHeight);
+                    monitor.ListenToGPUMemoryLoad(indicator);
+                    break;
+                case Vital.GPUFanRPM:
+                    indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Fan ", this.indicatorWidth, this.indicatorHeight);
+                    monitor.ListenToGPUFanSpeed(indicator);
+                    break;
+                case Vital.GPUTemp:
+                    indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Temp ", this.indicatorWidth, this.indicatorHeight);
+                    monitor.ListenToGPUTemp(indicator);
+                    break;
+                case Vital.HarddriveSpace:
+                    var drives = DriveInfo.GetDrives();
+                    for (int i = 0; i < drives.Count(); i++)
+                    {
+                        var drive = drives[i];
+                        var driveIndicator = new VitalIndicator($"{drive.Name} ", this.indicatorWidth, this.indicatorHeight);
+                        monitor.ListenToDrive(driveIndicator, drive);
+                        AddIndicatorWindow(driveIndicator, monitoringVital);
+                    }
+                    return;
+                default: return;
+            }
+            AddIndicatorWindow(indicator, monitoringVital);
         }
 
         private void AddIndicatorWindow(VitalIndicator indicator, Vital monitoringVital)
@@ -161,7 +163,10 @@ namespace PCHardwareMonitor
             settingsButton.Clip = rectangle;
             settingsButton.BorderThickness = new Thickness(0);
             SetSettingsButtonPosition(currentPosition);
-            settingsButton.Click += (object sender, RoutedEventArgs e) => { ShowSettingsWindow(); };
+            settingsButton.Click += (object sender, RoutedEventArgs e) => {
+                ShowSettingsWindow();
+                settingsButton.IsEnabled = false;
+            };
             this.parent.MouseLeave += (object sender, MouseEventArgs e) => {
                 if (this.parent.IsMouseOver == false)
                 {
@@ -216,7 +221,7 @@ namespace PCHardwareMonitor
             var settings = new string[] { "Hardware", "Window Background Color", "Bar Background Color", "Bar Foreground Color", "Border Color", "Font", "Position", "Reset" };
             var settingsPanel = new SettingsPanel(settings);
             var handler = new SettingsHandler(settingsPanel);
-            window.Closed += (object sender, EventArgs e) => { handler.Dispose(); };
+            window.Closed += (object sender, EventArgs e) => { handler.Dispose(); settingsButton.IsEnabled = true; };
             handler.Delegate = this;
             window.Content = settingsPanel;
             window.Show();
@@ -253,9 +258,31 @@ namespace PCHardwareMonitor
 
 
 
-        public void DidSelectNewVital(Vital vital, bool addOrRemove)
+        public void DidSelectNewVital(Vital vital, bool shouldAdd)
         {
-
+            if (shouldAdd)
+            {
+                AddNewIndicator(vital);
+                foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 0.0; }
+                SetPosition(currentPosition);
+                foreach (var indicatorWindow in indicatorWindows)
+                {
+                    if (indicatorWindow.monitoringVital == vital) { indicatorWindow.Show(); }
+                    indicatorWindow.Opacity = 1.0;
+                }
+            }
+            else
+            {
+                foreach (var indicatorWindow in indicatorWindows)
+                {
+                    indicatorWindow.Opacity = 0.0;
+                    if (indicatorWindow.monitoringVital == vital) { indicatorWindow.Close(); }
+                }
+                indicatorWindows.RemoveAll(window => window.monitoringVital == vital);
+                if (indicatorWindows.Count <= 0) { return; }
+                SetPosition(currentPosition);
+                foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 1.0; }
+            }
         }
 
         public void ResetSettings()

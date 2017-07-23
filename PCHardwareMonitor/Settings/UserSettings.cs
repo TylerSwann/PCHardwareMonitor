@@ -7,9 +7,9 @@ namespace PCHardwareMonitor
 {
     public class UserSettings
     {
-        private static HardwareVital[] defaultStartupVitals = new HardwareVital[] { HardwareVital.CPUUsage, HardwareVital.RAMUsage,
-                                                                                    HardwareVital.GPUUsage, HardwareVital.GPUMemoryUsage,
-                                                                                    HardwareVital.GPUTemp, HardwareVital.GPUFanRPM, HardwareVital.HarddriveSpace };
+        private static Vital[] defaultStartupVitals = new Vital[] { Vital.CPUUsage, Vital.RAMUsage,
+                                                                                    Vital.GPUUsage, Vital.GPUMemoryUsage,
+                                                                                    Vital.GPUTemp, Vital.GPUFanRPM, Vital.HarddriveSpace };
         private static LayoutPosition defaultStartupPosition = LayoutPosition.TopRight;
         private static Color defaultWindowBackgroundColor = Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255);
         private static Color defaultBarBackgroundColor = Color.FromArgb((byte)120, (byte)250, (byte)250, (byte)250);
@@ -19,7 +19,7 @@ namespace PCHardwareMonitor
         public static readonly UserSettings defaults = new UserSettings(defaultStartupVitals, defaultStartupPosition, defaultWindowBackgroundColor, defaultBarBackgroundColor, defaultBarForegroundColor, defaultBorderColor);
         public static UserSettings userSettings;
 
-        public HardwareVital[] startupVitals;
+        public Vital[] startupVitals;
         public LayoutPosition startupPosition;
         public Color windowBackgroundColor;
         public Color barBackgroundColor;
@@ -28,7 +28,7 @@ namespace PCHardwareMonitor
 
         public UserSettings() { }
 
-        public UserSettings(HardwareVital[] startupVitals, LayoutPosition startupPosition, Color windowBackgroundColor, Color barBackgroundColor, Color barForegroundColor, Color borderColor)
+        public UserSettings(Vital[] startupVitals, LayoutPosition startupPosition, Color windowBackgroundColor, Color barBackgroundColor, Color barForegroundColor, Color borderColor)
         {
             this.startupVitals = startupVitals;
             this.startupPosition = startupPosition;

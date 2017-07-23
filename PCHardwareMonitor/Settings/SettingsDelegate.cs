@@ -8,7 +8,7 @@ namespace PCHardwareMonitor
     {
         void DidSelectNewColor(SettingsOption selectedOption, Color? newColor);
         void DidSelectNewPosition(LayoutPosition position);
-        void DidSelectNewVital(HardwareVital vital);
+        void DidSelectNewVital(Vital vital, bool shouldAdd);
         void ResetSettings();
     }
 }

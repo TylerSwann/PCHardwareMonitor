@@ -16,16 +16,13 @@ namespace PCHardwareMonitor
         private Grid root;
         private double indicatorHeight = 40.0;
         private double indicatorWidth = 280.0;
-        private HoverButton settingsButton;
+        private Button settingsButton;
         private SolidColorBrush windowColor = new SolidColorBrush(Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255));
-        private List<BorderedVitalIndicator> borderedIndicators = new List<BorderedVitalIndicator>();
+        
         private VitalMonitor monitor = new VitalMonitor();
-        private List<Window> windows = new List<Window>();
+        private List<IndicatorWindow> indicatorWindows = new List<IndicatorWindow>();
         private LayoutPosition currentPosition;
-        private Vital[] vitals = new Vital[] { Vital.cpuLoad, Vital.ramLoad,
-                                               Vital.gpuLoad, Vital.gpuMemoryLoad,
-                                               Vital.gpuTemp, Vital.gpuFanSpeed, Vital.driveSpace };
-        private HardwareVital[] vitalsToMonitor;
+        private Vital[] vitalsToMonitor;
 
         public WindowManager(UserSettings settings, Window parent, Grid root)
         {
@@ -36,6 +33,8 @@ namespace PCHardwareMonitor
 
         public void Open()
         {
+            this.vitalsToMonitor = settings.startupVitals;
+            this.currentPosition = settings.startupPosition;
             SetupIndicators(() => {
                 ApplySettings();
                 SetPosition(currentPosition);
@@ -51,111 +50,96 @@ namespace PCHardwareMonitor
             {
                 this.vitalsToMonitor = settings.startupVitals;
                 this.currentPosition = settings.startupPosition;
-                foreach (var window in windows) { window.Background = new SolidColorBrush(settings.windowBackgroundColor); }
-                foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.indicator.SetBarBackgroundColor(settings.barBackgroundColor); }
-                foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.indicator.SetBarForegroundColor(settings.barForegroundColor); }
-                foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.BorderBrush = new SolidColorBrush(settings.borderColor); }
+                foreach (var indicatorWindow in indicatorWindows)
+                {
+                    indicatorWindow.Background = new SolidColorBrush(settings.windowBackgroundColor);
+                    indicatorWindow.SetBarBackgroundColor(settings.barBackgroundColor); 
+                    indicatorWindow.SetBarForegroundColor(settings.barForegroundColor);
+                    indicatorWindow.SetBorderBrushColor(settings.borderColor);
+                }
             }
         }
 
-        private void ShowWindows() { foreach (var window in windows.ToArray()) { window.Show(); } }
+        private void ShowWindows() { foreach (var indicatorWindow in indicatorWindows.ToArray()) { indicatorWindow.Show(); } }
 
         private void SetupIndicators(Action completion)
         {
-            foreach (var vital in vitals)
+            foreach (var vital in vitalsToMonitor)
             {
                 VitalIndicator indicator;
                 switch (vital)
                 {
-                    case Vital.cpuLoad:
+                    case Vital.CPUUsage:
                         indicator = new VitalIndicator($"{VitalMonitor.GetCPUName()} Load ", this.indicatorWidth, this.indicatorHeight);
                         monitor.ListenToCPUUsage(indicator);
                         break;
-                    case Vital.ramLoad:
+                    case Vital.RAMUsage:
                         indicator = new VitalIndicator("RAM Load ", this.indicatorWidth, this.indicatorHeight);
                         monitor.ListenToRAMUsage(indicator);
                         break;
-                    case Vital.cpuCoreLoad: /*SetupCPUCoreIndicators();*/ return;
-                    case Vital.gpuLoad:
+                    case Vital.CPUCoreUsage: /*SetupCPUCoreIndicators();*/ return;
+                    case Vital.GPUUsage:
                         indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Load ", this.indicatorWidth, this.indicatorHeight);
                         monitor.ListenToGPULoad(indicator);
                         break;
-                    case Vital.gpuMemoryLoad:
+                    case Vital.GPUMemoryUsage:
                         indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Memory ", this.indicatorWidth, this.indicatorHeight);
                         monitor.ListenToGPUMemoryLoad(indicator);
                         break;
-                    case Vital.gpuFanSpeed:
+                    case Vital.GPUFanRPM:
                         indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Fan ", this.indicatorWidth, this.indicatorHeight);
                         monitor.ListenToGPUFanSpeed(indicator);
                         break;
-                    case Vital.gpuTemp:
+                    case Vital.GPUTemp:
                         indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Temp ", this.indicatorWidth, this.indicatorHeight);
                         monitor.ListenToGPUTemp(indicator);
                         break;
-                    case Vital.driveSpace:
+                    case Vital.HarddriveSpace:
                         var drives = DriveInfo.GetDrives();
                         for (int i = 0; i < drives.Count(); i++)
                         {
                             var drive = drives[i];
                             var driveIndicator = new VitalIndicator($"{drive.Name} ", this.indicatorWidth, this.indicatorHeight);
                             monitor.ListenToDrive(driveIndicator, drive);
-                            AddIndicator(driveIndicator);
+                            AddIndicatorWindow(driveIndicator, vital);
                         }
                         continue;
                     default: continue;
                 }
-                AddIndicator(indicator);
+                AddIndicatorWindow(indicator, vital);
             }
             completion();
         }
 
-        private void AddIndicator(VitalIndicator indicator)
+        private void AddIndicatorWindow(VitalIndicator indicator, Vital monitoringVital)
         {
             var borderedIndicator = new BorderedVitalIndicator(indicator, this.indicatorWidth, this.indicatorHeight);
-            var window = AddWindow(borderedIndicator, (indicator.Width - 70.0), indicator.Height);
-            windows.Add(window);
-            borderedIndicators.Add(borderedIndicator);
-        }
-
-
-        private Window AddWindow(UIElement root, double width, double height)
-        {
-            var window = new Window();
-            window.Width = width;
-            window.Height = height;
-            window.AllowsTransparency = true;
-            window.WindowStyle = WindowStyle.None;
-            var windowBlur = new WindowBlur(window);
-            window.ShowInTaskbar = false;
-            window.Content = root;
-            window.Background = windowColor;
-            window.MouseDown += (object sender, MouseButtonEventArgs e) => { window.DragMove(); };
-            window.Loaded += (object sender, RoutedEventArgs e) => { windowBlur.Apply(); };
-            return window;
+            var indicatorWindow = new IndicatorWindow(borderedIndicator, monitoringVital, (indicator.Width - 70.0), indicator.Height);
+            indicatorWindows.Add(indicatorWindow);
         }
 
         private void SetPosition(LayoutPosition position)
         {
-            switch(position)
+            switch (position)
             {
                 case LayoutPosition.TopRight:
-                    WindowPositioner.StackWindowsToTopRight(this.windows.ToArray());
+                    WindowPositioner.StackWindowsToTopRight(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToRight(this.parent);
                     break;
                 case LayoutPosition.TopLeft:
-                    WindowPositioner.StackWindowsToTopLeft(this.windows.ToArray());
+                    WindowPositioner.StackWindowsToTopLeft(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToLeft(this.parent);
                     break;
                 case LayoutPosition.BottomRight:
-                    WindowPositioner.StackWindowsToBottomRight(this.windows.ToArray());
+                    WindowPositioner.StackWindowsToBottomRight(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToRight(this.parent);
                     break;
                 case LayoutPosition.BottomLeft:
-                    WindowPositioner.StackWindowsToBottomLeft(this.windows.ToArray());
+                    WindowPositioner.StackWindowsToBottomLeft(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToLeft(this.parent);
                     break;
                 case LayoutPosition.Center:
-                    WindowPositioner.StackWindowsToCenter(this.windows.ToArray());
+                    WindowPositioner.StackWindowsToCenter(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToCenter(this.parent);
                     break;
                 default: break;
@@ -165,16 +149,31 @@ namespace PCHardwareMonitor
 
         private void AddSettingsButton()
         {
-            settingsButton = new HoverButton(30.0, 30.0);
+            var rectangle = new RectangleGeometry();
+            rectangle.RadiusX = 5.0;
+            rectangle.RadiusY = 5.0;
+            rectangle.Rect = new Rect(new Point(0, 0), new Size(30.0, 30.0));
+            settingsButton = new Button();
+            settingsButton.Width = 30.0;
+            settingsButton.Height = 30.0;
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb((byte)1, (byte)45, (byte)45, (byte)45));
+            settingsButton.ClipToBounds = true;
+            settingsButton.Clip = rectangle;
+            settingsButton.BorderThickness = new Thickness(0);
             SetSettingsButtonPosition(currentPosition);
-            settingsButton.CornerRadius = new CornerRadius(5);
-            settingsButton.Opacity = 0.0;
-            settingsButton.onClick = () => { ShowSettingsWindow(); };
-            this.parent.MouseLeave += (object sender, MouseEventArgs e) => { settingsButton.SetHidden(); };
-            this.parent.MouseEnter += (object sender, MouseEventArgs e) => { settingsButton.SetVisible(); };
+            settingsButton.Click += (object sender, RoutedEventArgs e) => { ShowSettingsWindow(); };
+            this.parent.MouseLeave += (object sender, MouseEventArgs e) => {
+                if (this.parent.IsMouseOver == false)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    settingsButton.Background = new SolidColorBrush(Color.FromArgb((byte)1, (byte)45, (byte)45, (byte)45));
+                }
+            };
+            this.parent.MouseEnter += (object sender, MouseEventArgs e) => {
+                settingsButton.Background = new SolidColorBrush(Color.FromArgb((byte)255, (byte)45, (byte)45, (byte)45));
+            };
             root.Children.Add(settingsButton);
         }
-
         private void SetSettingsButtonPosition(LayoutPosition position)
         {
             switch (position)
@@ -231,28 +230,30 @@ namespace PCHardwareMonitor
             switch (selectedOption)
             {
                 case SettingsOption.WindowBackgroundColor:
-                    foreach (var window in windows) { window.Background = new SolidColorBrush(color); }
+                    foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Background = new SolidColorBrush(color); }
                     break;
                 case SettingsOption.BarBackgroundColor:
-                    foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.indicator.SetBarBackgroundColor(color); }
+                    foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.SetBarBackgroundColor(color); }
                     break;
                 case SettingsOption.BarForegroundColor:
-                    foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.indicator.SetBarForegroundColor(color); }
+                    foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.SetBarForegroundColor(color); }
                     break;
                 case SettingsOption.BorderColor:
-                    foreach (var borderedIndicator in borderedIndicators) { borderedIndicator.BorderBrush = new SolidColorBrush(color); }
+                    foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.SetBorderBrushColor(color); }
                     break;
                 default: break;
             }
         }
         public void DidSelectNewPosition(LayoutPosition position)
         {
-            foreach (var window in windows) { window.Opacity = 0.0; }
+            foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 0.0; }
             SetPosition(position);
-            foreach (var window in windows) { window.Opacity = 1.0; }
+            foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 1.0; }
         }
 
-        public void DidSelectNewVital(HardwareVital vital)
+
+
+        public void DidSelectNewVital(Vital vital, bool addOrRemove)
         {
 
         }

@@ -80,7 +80,7 @@
     </ApplicationDefinition>
     <Compile Include="AppDirectory.cs" />
     <Compile Include="BorderedVitalIndicator.cs" />
-    <Compile Include="HoverButton.cs" />
+    <Compile Include="IndicatorWindow.cs" />
     <Compile Include="Settings\SettingsDelegate.cs" />
     <Compile Include="Settings\SettingsHandler.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />

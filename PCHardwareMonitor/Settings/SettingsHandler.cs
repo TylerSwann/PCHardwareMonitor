@@ -12,7 +12,6 @@ using Newtonsoft.Json;
 namespace PCHardwareMonitor
 {
     public enum SettingsOption { Hardware = 0, WindowBackgroundColor, BarBackgroundColor, BarForegroundColor, BorderColor, Font, Position, Reset }
-    public enum HardwareVital { GPUTemp = 0, GPUFanRPM, GPUUsage, GPUMemoryUsage, CPUUsage, CPUCoreUsage, RAMUsage, HarddriveSpace }
     public enum LayoutPosition { TopRight, TopLeft, BottomRight, BottomLeft, Center }
 
     class SettingsHandler: IDisposable
@@ -20,7 +19,7 @@ namespace PCHardwareMonitor
         private string[] optionTitles = new string[] { "Hardware", "Window Background Color", "Bar Background Color", "Bar Foreground Color", "Border Color", "Font", "Position" };
         private string[] hardwareVitalTitles = new string[] { "GPU Temp", "GPU Fan RPM", "GPU Usage", "GPU Memory Usage", "CPU Usage", "CPU Core Usage", "RAM Usage", "Harddrive Space"};
         private string[] positionTitles = new string[] { "Top Right", "Top Left", "Bottom Right", "Bottom Left", "Center" };
-        private List<HardwareVital> vitalsToMonitor = new List<HardwareVital>();
+        private List<Vital> vitalsToMonitor = new List<Vital>();
         private List<UICheckBox> checkboxes = new List<UICheckBox>();
         private StackPanel hardwareMenu = new StackPanel();
         private UserSettings settings;
@@ -56,16 +55,17 @@ namespace PCHardwareMonitor
             settingsPanel.colorCanvas.Visibility = Visibility.Hidden;
             settingsPanel.SetButtonSelected(0, true);
             settingsPanel.didSelectedNewColor = (color) => { NewColorWasSelected(color); };
-            foreach (HardwareVital vital in settings.startupVitals) { vitalsToMonitor.Add(vital); }
+            foreach (Vital vital in settings.startupVitals) { vitalsToMonitor.Add(vital); }
             for(int i = 0; i < hardwareVitalTitles.Length; i++)
             {
-                var vital = (HardwareVital)i;
+                var vital = (Vital)i;
                 var checkbox = new UICheckBox(hardwareVitalTitles[i]);
                 checkbox.label.Foreground = new SolidColorBrush(Color.FromRgb((byte)200, (byte)200, (byte)200));
                 checkboxes.Add(checkbox);
                 checkbox.MouseLeftButtonDown += (object sender, MouseButtonEventArgs e) => {
-                    if (checkbox.isChecked) { vitalsToMonitor.Add(vital); this.Delegate.DidSelectNewVital(vital); }
-                    else { if (vitalsToMonitor.Contains(vital)) { vitalsToMonitor.Remove(vital); } }
+
+                    if (checkbox.isChecked) { vitalsToMonitor.Add(vital); this.Delegate.DidSelectNewVital(vital, true); }
+                    else { if (vitalsToMonitor.Contains(vital)) { vitalsToMonitor.Remove(vital); this.Delegate.DidSelectNewVital(vital, false); } }
                     settings.startupVitals = vitalsToMonitor.ToArray();
                 };
                 hardwareMenu.Children.Add(checkbox);
@@ -168,7 +168,7 @@ namespace PCHardwareMonitor
             for (int i = 0; i < checkboxes.ToArray().Length; i++)
             {
                 var checkbox = checkboxes[i];
-                if (vitalsToMonitor.Contains((HardwareVital)i)) { checkbox.SetChecked(true); }
+                if (vitalsToMonitor.Contains((Vital)i)) { checkbox.SetChecked(true); }
             }
         }
 

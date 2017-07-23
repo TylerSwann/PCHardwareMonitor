@@ -9,9 +9,7 @@ using System.IO;
 
 namespace PCHardwareMonitor
 {
-    public enum Vital { cpuLoad, ramLoad, gpuLoad, gpuMemoryLoad, gpuFanSpeed, gpuTemp, driveSpace, cpuCoreLoad };
-    public enum WindowOrientation { vertical, horizontal }
-    public enum WindowPosition { top, bottom, left, right }
+    public enum Vital { GPUTemp = 0, GPUFanRPM, GPUUsage, GPUMemoryUsage, CPUUsage, CPUCoreUsage, RAMUsage, HarddriveSpace };
 
     public partial class MainWindow : Window
     {

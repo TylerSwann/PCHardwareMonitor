@@ -24,7 +24,7 @@ namespace PCHardwareMonitor
                 var title = titles[i];
                 var button = new UIRadioButton(title);
                 var index = Array.FindIndex<string>(titles, x => x.Contains(title));
-                if (i == 0) { button.SetSelected(true); }
+                //if (i == 0) { button.SetSelected(true); }
                 button.onClick = () => {
                     selectedIndex = index;
                     didSelectedIndex(selectedIndex);

@@ -57,7 +57,7 @@ namespace PCHardwareMonitor
             fillOffset.VerticalAlignment = VerticalAlignment.Center;
             fillOffset.HorizontalAlignment = HorizontalAlignment.Left;
             fillOffset.Fill = deselectedColor;
-            fillOffset.MouseLeftButtonDown += (object sender, MouseButtonEventArgs e) => { SwitchSelected(true); onClick(); };
+            fillOffset.MouseLeftButtonDown += (object sender, MouseButtonEventArgs e) => { if (isOn == false) { SwitchSelected(true); onClick(); } };
             fillOffset.MouseEnter += (object sender, MouseEventArgs e) => { fillOffset.Opacity = 0.7; button.Opacity = 0.7; };
             fillOffset.MouseLeave += (object sender, MouseEventArgs e) => { fillOffset.Opacity = 1.0; button.Opacity = 1.0; };
 
@@ -70,8 +70,8 @@ namespace PCHardwareMonitor
 
         public void SetSelected(bool isChecked)
         {
-            if (isChecked && !this.isOn || !isChecked && this.isOn) { SwitchSelected(true); }
-            else if (isChecked && this.isOn || !isChecked && !this.isOn) { return; }
+            if (isChecked && this.isOn == false) { SwitchSelected(true); }
+            else if (!isChecked && this.isOn) { SwitchSelected(true); }
         }
 
         private void SwitchSelected(bool animated)

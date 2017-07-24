@@ -80,7 +80,9 @@
     </ApplicationDefinition>
     <Compile Include="AppDirectory.cs" />
     <Compile Include="BorderedVitalIndicator.cs" />
+    <Compile Include="IndicatorTheming\ColorScheme.cs" />
     <Compile Include="IndicatorWindow.cs" />
+    <Compile Include="IndicatorTheming\Font.cs" />
     <Compile Include="Settings\SettingsDelegate.cs" />
     <Compile Include="Settings\SettingsHandler.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
@@ -132,5 +134,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

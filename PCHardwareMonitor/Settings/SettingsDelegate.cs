@@ -1,6 +1,6 @@
 ﻿
 using System.Windows.Media;
-using System;
+using PCHardwareMonitor.IndicatorTheming;
 
 namespace PCHardwareMonitor
 {
@@ -9,6 +9,7 @@ namespace PCHardwareMonitor
         void DidSelectNewColor(SettingsOption selectedOption, Color? newColor);
         void DidSelectNewPosition(LayoutPosition position, bool layoutInRows);
         void DidSelectNewVital(Vital vital, bool shouldAdd);
+        void DidSelectNewFont(Font font);
         void ResetSettings();
     }
 }

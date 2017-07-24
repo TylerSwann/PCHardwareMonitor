@@ -55,6 +55,7 @@ namespace PCHardwareMonitor
                     indicatorWindow.SetBarBackgroundColor(settings.barBackgroundColor); 
                     indicatorWindow.SetBarForegroundColor(settings.barForegroundColor);
                     indicatorWindow.SetBorderBrushColor(settings.borderColor);
+                    indicatorWindow.SetFont(settings.font);
                 }
             }
         }
@@ -284,6 +285,15 @@ namespace PCHardwareMonitor
             foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 1.0; }
         }
 
+        public void DidSelectedNewFont(string font, int size)
+        {
+            foreach (var indicatorWindow in indicatorWindows)
+            {
+                indicatorWindow.indicator.indicator.label.FontFamily = new FontFamily(font);
+                indicatorWindow.indicator.indicator.label.FontSize = size;
+            }
+        }
+
 
 
         public void DidSelectNewVital(Vital vital, bool shouldAdd)
@@ -311,6 +321,11 @@ namespace PCHardwareMonitor
                 SetPosition(currentPosition);
                 foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 1.0; }
             }
+        }
+
+        public void DidSelectNewFont(IndicatorTheming.Font font)
+        {
+            foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.SetFont(font); }
         }
 
         public void ResetSettings()

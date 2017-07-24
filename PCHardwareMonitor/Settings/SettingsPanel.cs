@@ -54,7 +54,7 @@ namespace PCHardwareMonitor
             colorCanvas.Height = 500.0;
             colorCanvas.BorderThickness = new Thickness(0, 0, 0, 0);
             colorCanvas.Background = new SolidColorBrush(Color.FromArgb((byte)0, (byte)0, (byte)0, (byte)0));
-            colorCanvas.Margin = new Thickness(0, 0, 25, 0);
+            colorCanvas.Margin = new Thickness(0, 0, 25, 50);
             colorCanvas.HorizontalAlignment = HorizontalAlignment.Right;
             colorCanvas.VerticalAlignment = VerticalAlignment.Center;
             colorCanvas.SelectedColorChanged += (object sender, RoutedPropertyChangedEventArgs<Color?> e) => { didSelectedNewColor(e.NewValue.Value); };

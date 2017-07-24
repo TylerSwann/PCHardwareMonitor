@@ -19,11 +19,15 @@ namespace PCHardwareMonitor
         private string[] optionTitles = new string[] { "Hardware", "Window Background Color", "Bar Background Color", "Bar Foreground Color", "Border Color", "Font", "Position" };
         private string[] hardwareVitalTitles = new string[] { "GPU Temp", "GPU Fan RPM", "GPU Usage", "GPU Memory Usage", "CPU Usage", "CPU Core Usage", "RAM Usage", "Harddrive Space"};
         private string[] positionTitles = new string[] { "Top Right", "Top Left", "Bottom Right", "Bottom Left", "Center" };
+        private List<string> fontFamilies = new List<string>();
         private List<Vital> vitalsToMonitor = new List<Vital>();
         private List<CheckBox> checkboxes = new List<CheckBox>();
         private List<RadioButton> radioButtons = new List<RadioButton>();
         private StackPanel hardwareMenu = new StackPanel();
         private CheckBox rowsCheckBox = new CheckBox();
+        private ComboBox fontbox = new ComboBox();
+        private Slider fontSizeSlider = new Slider();
+        private Label fontSizeLabel = new Label();
         private UserSettings settings;
         private StackPanel positionMenu;
         private SettingsPanel settingsPanel;
@@ -86,6 +90,38 @@ namespace PCHardwareMonitor
             settingsPanel.SetButtonSelected(0, true);
             settingsPanel.didSelectedNewColor = (color) => { NewColorWasSelected(color); };
             foreach (Vital vital in settings.startupVitals) { vitalsToMonitor.Add(vital); }
+            foreach (var font in Fonts.SystemFontFamilies) { fontFamilies.Add(font.ToString()); }
+            fontbox.Width = 120.0;
+            fontbox.Height = 22.0;
+            fontbox.ItemsSource = fontFamilies;
+            fontbox.SelectedIndex = fontFamilies.IndexOf(settings.font.fontFamily);
+            fontbox.Visibility = Visibility.Hidden;
+            fontbox.HorizontalAlignment = HorizontalAlignment.Center;
+            fontbox.VerticalAlignment = VerticalAlignment.Center;
+            fontbox.Margin = new Thickness(250, 120, 0, 0);
+            fontbox.SelectionChanged += (object sender, SelectionChangedEventArgs e) => { settings.font.fontFamily = (string)fontbox.SelectedItem; this.Delegate.DidSelectNewFont(settings.font); };
+            fontSizeSlider.Width = 200.0;
+            fontSizeSlider.Height = 20.0;
+            fontSizeSlider.Maximum = 40.0;
+            fontSizeSlider.Value = settings.font.size;
+            fontSizeSlider.ValueChanged += (object sender, RoutedPropertyChangedEventArgs<double> e) => {
+                fontSizeLabel.Content = $"Font Size: {(int)e.NewValue}";
+                settings.font.size = (int)e.NewValue;
+                this.Delegate.DidSelectNewFont(settings.font);
+            };
+            fontSizeSlider.Margin = new Thickness(340, 50, 0, 0);
+            fontSizeSlider.Visibility = Visibility.Hidden;
+            fontSizeLabel.Width = 80.0;
+            fontSizeLabel.Height = 35.0;
+            fontSizeLabel.Content = "Font Size: 20";
+            fontSizeLabel.VerticalAlignment = VerticalAlignment.Center;
+            fontSizeLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            fontSizeLabel.Margin = new Thickness(60, 60, 0, 0);
+            fontSizeLabel.Visibility = Visibility.Hidden;
+            settingsPanel.Children.Add(fontSizeLabel);
+            settingsPanel.Children.Add(fontSizeSlider);
+            settingsPanel.Children.Add(fontbox);
+
             for (int i = 0; i < hardwareVitalTitles.Length; i++)
             {
                 var vital = (Vital)i;
@@ -176,6 +212,7 @@ namespace PCHardwareMonitor
                 case SettingsOption.BarBackgroundColor: settings.barBackgroundColor = newColor; break;
                 case SettingsOption.BarForegroundColor: settings.barForegroundColor = newColor; break;
                 case SettingsOption.BorderColor: settings.borderColor = newColor; break;
+                case SettingsOption.Font: settings.font.textColor = newColor; this.Delegate.DidSelectNewFont(settings.font); break;
                 default: break;
             }
         }
@@ -192,6 +229,7 @@ namespace PCHardwareMonitor
                 case SettingsOption.BarBackgroundColor: settingsPanel.colorCanvas.SelectedColor = settings.barBackgroundColor; break;
                 case SettingsOption.BarForegroundColor: settingsPanel.colorCanvas.SelectedColor = settings.barForegroundColor; break;
                 case SettingsOption.BorderColor: settingsPanel.colorCanvas.SelectedColor = settings.borderColor; break;
+                case SettingsOption.Font: settingsPanel.colorCanvas.SelectedColor = settings.font.textColor; break;
                 default: break;
             }
         }
@@ -199,6 +237,9 @@ namespace PCHardwareMonitor
         private void ShowCheckMenu()
         {
             settingsPanel.colorCanvas.Visibility = Visibility.Hidden;
+            fontSizeSlider.Visibility = Visibility.Hidden;
+            fontbox.Visibility = Visibility.Hidden;
+            fontSizeLabel.Visibility = Visibility.Hidden;
             hardwareMenu.Visibility = Visibility.Visible;
             positionMenu.Visibility = Visibility.Hidden;
             for (int i = 0; i < checkboxes.ToArray().Length; i++)
@@ -219,13 +260,21 @@ namespace PCHardwareMonitor
                 case (LayoutPosition)4: radioButtons[4].IsChecked = true; break;
             }
             settingsPanel.colorCanvas.Visibility = Visibility.Hidden;
+            fontSizeSlider.Visibility = Visibility.Hidden;
+            fontbox.Visibility = Visibility.Hidden;
+            fontSizeLabel.Visibility = Visibility.Hidden;
             hardwareMenu.Visibility = Visibility.Hidden;
             positionMenu.Visibility = Visibility.Visible;
         }
 
         private void ShowFontMenu()
         {
-
+            settingsPanel.colorCanvas.Visibility = Visibility.Visible;
+            fontSizeSlider.Visibility = Visibility.Visible;
+            fontbox.Visibility = Visibility.Visible;
+            fontSizeLabel.Visibility = Visibility.Visible;
+            hardwareMenu.Visibility = Visibility.Hidden;
+            positionMenu.Visibility = Visibility.Hidden;
         }
 
         private void SaveUserSettings()

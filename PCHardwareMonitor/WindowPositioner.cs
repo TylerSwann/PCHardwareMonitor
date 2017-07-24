@@ -113,6 +113,85 @@ namespace PCHardwareMonitor
             }
         }
 
+
+
+        public static void StackWindowsInRowToBottomRight(Window[] windows)
+        {
+            var spacing = (windows[0].Height * 1.1);
+            var nextPosition = (SystemParameters.WorkArea.Height - (windows[0].Height + 10.0));
+            var isSideWindow = false;
+            foreach (var window in windows)
+            {
+                var leftOffset = (SystemParameters.WorkArea.Width - (window.Width + 10.0));
+                window.Top = nextPosition;
+                window.Left = isSideWindow ? leftOffset : (leftOffset - (window.Width + 10.0));
+                nextPosition -= isSideWindow ? spacing : 0.0;
+                isSideWindow = !isSideWindow;
+            }
+        }
+
+        public static void StackWindowsInRowToBottomLeft(Window[] windows)
+        {
+            var spacing = (windows[0].Height * 1.1);
+            var nextPosition = (SystemParameters.WorkArea.Height - (windows[0].Height + 10.0));
+            var isSideWindow = false;
+            foreach (var window in windows)
+            {
+                var leftOffset = 10.0;
+                window.Top = nextPosition;
+                window.Left = isSideWindow ? leftOffset : (leftOffset + (window.Width + 10.0));
+                nextPosition -= isSideWindow ? spacing : 0.0;
+                isSideWindow = !isSideWindow;
+            }
+        }
+
+        public static void StackWindowsInRowToCenter(Window[] windows)
+        {
+            var spacing = (windows[0].Height * 1.1);
+            var nextPosition = ((SystemParameters.WorkArea.Height / 2) - ((windows.Length / 2) * (windows[0].Height / 2)));
+            var isSideWindow = false;
+            foreach (var window in windows)
+            {
+                var leftOffset = ((SystemParameters.WorkArea.Width / 2) - (window.Width + 10.0));
+                window.Top = nextPosition;
+                window.Left = isSideWindow ? leftOffset : (leftOffset + (window.Width + 10.0));
+                nextPosition += isSideWindow ? spacing : 0.0;
+                isSideWindow = !isSideWindow;
+            }
+        }
+
+        public static void StackWindowsInRowToTopRight(Window[] windows)
+        {
+            var spacing = (windows[0].Height * 1.1);
+            var nextPosition = 10.0;
+            var isSideWindow = false;
+            foreach (var window in windows)
+            {
+                var leftOffset = (SystemParameters.WorkArea.Width - (window.Width + 10.0));
+                window.Top = nextPosition;
+                window.Left = isSideWindow ? leftOffset : (leftOffset - (window.Width + 10.0));
+                nextPosition += isSideWindow ? spacing : 0.0;
+                isSideWindow = !isSideWindow;
+            }
+        }
+
+        public static void StackWindowsInRowToTopLeft(Window[] windows)
+        {
+            var spacing = (windows[0].Height * 1.1);
+            var nextPosition = 10.0;
+            var isSideWindow = false;
+            foreach (var window in windows)
+            {
+                var leftOffset = 10.0;
+                window.Top = nextPosition;
+                window.Left = isSideWindow ? leftOffset : (leftOffset + (window.Width + 10.0));
+                nextPosition += isSideWindow ? spacing : 0.0;
+                isSideWindow = !isSideWindow;
+            }
+        }
+
+
+        /*// Will be removed
         public static void StackWindowsInRowToRight(Window[] windows)
         {
             var spacing = (windows[0].Height * 1.1);
@@ -128,6 +207,7 @@ namespace PCHardwareMonitor
             }
         }
 
+        // Will be removed
         public static void StackWindowsInRowToLeft(Window[] windows)
         {
             var spacing = (windows[0].Height * 1.1);
@@ -194,6 +274,6 @@ namespace PCHardwareMonitor
                 window.Left = nextPosition;
                 nextPosition += spacing;
             }
-        }
+        }*/
     }
 }

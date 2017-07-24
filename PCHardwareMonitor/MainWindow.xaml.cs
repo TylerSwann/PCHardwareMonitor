@@ -30,6 +30,7 @@ namespace PCHardwareMonitor
             this.WindowStyle = WindowStyle.None;
             this.Background = new SolidColorBrush(Color.FromArgb((byte)1, (byte)255, (byte)255, (byte)255));
             this.ShowInTaskbar = false;
+            this.Title = "PC Hardware Monitor";
             ReadSettings();
             manager = new WindowManager(this.settings, this, this.root);
             manager.Open();

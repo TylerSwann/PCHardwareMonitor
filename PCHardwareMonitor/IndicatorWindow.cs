@@ -27,6 +27,7 @@ namespace PCHardwareMonitor
             this.Background = new SolidColorBrush(Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255)); ;
             this.MouseDown += (object sender, MouseButtonEventArgs e) => { this.DragMove(); };
             this.Loaded += (object sender, RoutedEventArgs e) => { windowBlur.Apply(); };
+            this.Title = monitoringVital.ToString();
         }
 
         public void SetBarBackgroundColor(Color color) { this.indicator.indicator.SetBarBackgroundColor(color); }

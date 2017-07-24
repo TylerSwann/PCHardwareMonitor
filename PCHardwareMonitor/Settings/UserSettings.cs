@@ -16,7 +16,7 @@ namespace PCHardwareMonitor
         private static Color defaultBarForegroundColor = Color.FromRgb((byte)50, (byte)50, (byte)50);
         private static Color defaultBorderColor = Color.FromArgb((byte)255, (byte)50, (byte)50, (byte)50);
 
-        public static readonly UserSettings defaults = new UserSettings(defaultStartupVitals, defaultStartupPosition, defaultWindowBackgroundColor, defaultBarBackgroundColor, defaultBarForegroundColor, defaultBorderColor);
+        public static readonly UserSettings defaults = new UserSettings(defaultStartupVitals, defaultStartupPosition, false, defaultWindowBackgroundColor, defaultBarBackgroundColor, defaultBarForegroundColor, defaultBorderColor);
         public static UserSettings userSettings;
 
         public Vital[] startupVitals;
@@ -25,10 +25,11 @@ namespace PCHardwareMonitor
         public Color barBackgroundColor;
         public Color barForegroundColor;
         public Color borderColor;
+        public bool layoutIsInRows;
 
         public UserSettings() { }
 
-        public UserSettings(Vital[] startupVitals, LayoutPosition startupPosition, Color windowBackgroundColor, Color barBackgroundColor, Color barForegroundColor, Color borderColor)
+        public UserSettings(Vital[] startupVitals, LayoutPosition startupPosition, bool layoutIsInRows, Color windowBackgroundColor, Color barBackgroundColor, Color barForegroundColor, Color borderColor)
         {
             this.startupVitals = startupVitals;
             this.startupPosition = startupPosition;

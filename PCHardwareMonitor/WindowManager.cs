@@ -18,7 +18,6 @@ namespace PCHardwareMonitor
         private double indicatorWidth = 280.0;
         private Button settingsButton;
         private SolidColorBrush windowColor = new SolidColorBrush(Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255));
-        
         private VitalMonitor monitor = new VitalMonitor();
         private List<IndicatorWindow> indicatorWindows = new List<IndicatorWindow>();
         private LayoutPosition currentPosition;
@@ -125,24 +124,52 @@ namespace PCHardwareMonitor
             switch (position)
             {
                 case LayoutPosition.TopRight:
-                    WindowPositioner.StackWindowsToTopRight(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToRight(this.parent);
+                    if (settings.layoutIsInRows)
+                    {
+                        this.parent.Left -= this.parent.Width;
+                        this.parent.Width *= 2;
+                        WindowPositioner.StackWindowsInRowToTopRight(this.indicatorWindows.ToArray());
+                    }
+                    else { WindowPositioner.StackWindowsToTopRight(this.indicatorWindows.ToArray()); }
                     break;
                 case LayoutPosition.TopLeft:
-                    WindowPositioner.StackWindowsToTopLeft(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToLeft(this.parent);
+                    if (settings.layoutIsInRows)
+                    {
+                        this.parent.Width *= 2;
+                        WindowPositioner.StackWindowsInRowToTopLeft(this.indicatorWindows.ToArray());
+                    }
+                    else { WindowPositioner.StackWindowsToTopLeft(this.indicatorWindows.ToArray()); }
                     break;
                 case LayoutPosition.BottomRight:
-                    WindowPositioner.StackWindowsToBottomRight(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToRight(this.parent);
+                    if (settings.layoutIsInRows)
+                    {
+                        this.parent.Left -= this.parent.Width;
+                        this.parent.Width *= 2;
+                        WindowPositioner.StackWindowsInRowToBottomRight(this.indicatorWindows.ToArray());
+                    }
+                    else { WindowPositioner.StackWindowsToBottomRight(this.indicatorWindows.ToArray()); }
                     break;
                 case LayoutPosition.BottomLeft:
-                    WindowPositioner.StackWindowsToBottomLeft(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToLeft(this.parent);
+                    if (settings.layoutIsInRows)
+                    {
+                        this.parent.Width *= 2;
+                        WindowPositioner.StackWindowsInRowToBottomLeft(this.indicatorWindows.ToArray());
+                    }
+                    else { WindowPositioner.StackWindowsToBottomLeft(this.indicatorWindows.ToArray()); }
                     break;
                 case LayoutPosition.Center:
-                    WindowPositioner.StackWindowsToCenter(this.indicatorWindows.ToArray());
                     WindowPositioner.PositionToCenter(this.parent);
+                    if (settings.layoutIsInRows)
+                    {
+                        this.parent.Left -= (this.parent.Width / 2);
+                        this.parent.Width *= 2;
+                        WindowPositioner.StackWindowsInRowToCenter(this.indicatorWindows.ToArray());
+                    }
+                    else { WindowPositioner.StackWindowsToCenter(this.indicatorWindows.ToArray()); }
                     break;
                 default: break;
             }
@@ -249,8 +276,9 @@ namespace PCHardwareMonitor
                 default: break;
             }
         }
-        public void DidSelectNewPosition(LayoutPosition position)
+        public void DidSelectNewPosition(LayoutPosition position, bool layoutInRows)
         {
+            settings.layoutIsInRows = layoutInRows;
             foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 0.0; }
             SetPosition(position);
             foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Opacity = 1.0; }

@@ -167,13 +167,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="screenshots\screenshot1.PNG" />
     <Resource Include="screenshots\screenshot10.PNG" />
     <Resource Include="screenshots\screenshot11.PNG" />
-    <Resource Include="screenshots\screenshot2.PNG" />
     <Resource Include="screenshots\screenshot5.PNG" />
     <Resource Include="screenshots\screenshot6.PNG" />
     <Resource Include="screenshots\screenshot9.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="screenshots\customizationScreenShots.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -29,7 +29,7 @@ namespace PCHardwareMonitor
             Uri iconUri = new Uri("pack://application:,,,/heart.ico", UriKind.RelativeOrAbsolute);
             this.AllowsTransparency = true;
             this.WindowStyle = WindowStyle.None;
-            this.Background = new SolidColorBrush(Color.FromArgb((byte)1, (byte)255, (byte)255, (byte)255));
+            this.Background = new SolidColorBrush(Color.FromArgb((byte)0, (byte)255, (byte)255, (byte)255));
             this.ShowInTaskbar = false;
             this.Title = "PC Hardware Monitor";
             this.Icon = System.Windows.Media.Imaging.BitmapFrame.Create(iconUri);

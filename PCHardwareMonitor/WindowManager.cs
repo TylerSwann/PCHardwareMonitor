@@ -38,7 +38,6 @@ namespace PCHardwareMonitor
                 SetPosition(currentPosition);
                 ApplySettings();
                 ShowWindows();
-                //AddSettingsButton();
             });
         }
 
@@ -80,7 +79,6 @@ namespace PCHardwareMonitor
                     indicator = new VitalIndicator("RAM Load ", this.indicatorWidth, this.indicatorHeight);
                     monitor.ListenToRAMUsage(indicator);
                     break;
-                case Vital.CPUCoreUsage: /*SetupCPUCoreIndicators();*/ return;
                 case Vital.GPUUsage:
                     indicator = new VitalIndicator($"{VitalMonitor.GetGPUName()} Load ", this.indicatorWidth, this.indicatorHeight);
                     monitor.ListenToGPULoad(indicator);
@@ -121,6 +119,7 @@ namespace PCHardwareMonitor
 
         private void SetPosition(LayoutPosition position)
         {
+            if (indicatorWindows.Count <= 0) { return; }
             switch (position)
             {
                 case LayoutPosition.TopRight:
@@ -277,20 +276,5 @@ namespace PCHardwareMonitor
                 ApplySettings();
             }
         }
-
-        // TODO
-        /*private void SetupCPUCoreIndicators()
-        {
-            List<VitalIndicator> indicators = new List<VitalIndicator>();
-            for (int i = 0; i < VitalMonitor.GetCPUCoreCount(); i++)
-            {
-                var indicator = new VitalIndicator($"CPU {i + 1}: ", this.indicatorWidth, this.indicatorHeight);
-                indicator.Height = indicator.Height;
-                indicator.label.FontSize = 15.0;
-                indicator.VerticalAlignment = VerticalAlignment.Bottom;
-                indicators.Add(indicator);
-            }
-            monitor.ListenToCPUCoreUsage(indicators.ToArray());
-        }*/
     }
 }

@@ -17,7 +17,7 @@ namespace PCHardwareMonitor
     class SettingsHandler: IDisposable
     {
         private string[] optionTitles = new string[] { "Hardware", "Window Background Color", "Bar Background Color", "Bar Foreground Color", "Border Color", "Font", "Position" };
-        private string[] hardwareVitalTitles = new string[] { "GPU Temp", "GPU Fan RPM", "GPU Usage", "GPU Memory Usage", "CPU Usage", "CPU Core Usage", "RAM Usage", "Harddrive Space"};
+        private string[] hardwareVitalTitles = new string[] { "GPU Temp", "GPU Fan RPM", "GPU Usage", "GPU Memory Usage", "CPU Usage", "RAM Usage", "Harddrive Space"};
         private string[] positionTitles = new string[] { "Top Right", "Top Left", "Bottom Right", "Bottom Left", "Center" };
         private List<string> fontFamilies = new List<string>();
         private List<Vital> vitalsToMonitor = new List<Vital>();
@@ -90,7 +90,20 @@ namespace PCHardwareMonitor
             settingsPanel.SetButtonSelected(0, true);
             settingsPanel.didSelectedNewColor = (color) => { NewColorWasSelected(color); };
             foreach (Vital vital in settings.startupVitals) { vitalsToMonitor.Add(vital); }
-            foreach (var font in Fonts.SystemFontFamilies) { fontFamilies.Add(font.ToString()); }
+            bool hasReachedSegoe = false;
+            foreach (var font in Fonts.SystemFontFamilies)
+            {
+                fontFamilies.Add(font.ToString());
+                if (font.ToString().Contains("Segoe") && hasReachedSegoe == false)
+                {
+                    fontFamilies.Add("Segoe UI Black");
+                    fontFamilies.Add("Segoe UI Light");
+                    fontFamilies.Add("Segoe UI Semibold");
+                    fontFamilies.Add("Segoe UI Semilight");
+                    hasReachedSegoe = true;
+                }
+            }
+
             fontbox.Width = 120.0;
             fontbox.Height = 22.0;
             fontbox.ItemsSource = fontFamilies;
@@ -219,6 +232,9 @@ namespace PCHardwareMonitor
 
         private void ShowColorPicker()
         {
+            fontSizeSlider.Visibility = Visibility.Hidden;
+            fontbox.Visibility = Visibility.Hidden;
+            fontSizeLabel.Visibility = Visibility.Hidden;
             settingsPanel.colorCanvas.Visibility = Visibility.Visible;
             hardwareMenu.Visibility = Visibility.Hidden;
             positionMenu.Visibility = Visibility.Hidden;
@@ -269,7 +285,7 @@ namespace PCHardwareMonitor
 
         private void ShowFontMenu()
         {
-            settingsPanel.colorCanvas.Visibility = Visibility.Visible;
+            ShowColorPicker();
             fontSizeSlider.Visibility = Visibility.Visible;
             fontbox.Visibility = Visibility.Visible;
             fontSizeLabel.Visibility = Visibility.Visible;

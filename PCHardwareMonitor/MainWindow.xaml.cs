@@ -9,7 +9,7 @@ using System.IO;
 
 namespace PCHardwareMonitor
 {
-    public enum Vital { GPUTemp = 0, GPUFanRPM, GPUUsage, GPUMemoryUsage, CPUUsage, CPUCoreUsage, RAMUsage, HarddriveSpace };
+    public enum Vital { GPUTemp = 0, GPUFanRPM, GPUUsage, GPUMemoryUsage, CPUUsage, RAMUsage, HarddriveSpace };
 
     public partial class MainWindow : Window
     {

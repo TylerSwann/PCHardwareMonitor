@@ -16,7 +16,6 @@ namespace PCHardwareMonitor
         private Grid root;
         private double indicatorHeight = 40.0;
         private double indicatorWidth = 280.0;
-        private Button settingsButton;
         private SolidColorBrush windowColor = new SolidColorBrush(Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255));
         private VitalMonitor monitor = new VitalMonitor();
         private List<IndicatorWindow> indicatorWindows = new List<IndicatorWindow>();
@@ -39,7 +38,7 @@ namespace PCHardwareMonitor
                 SetPosition(currentPosition);
                 ApplySettings();
                 ShowWindows();
-                AddSettingsButton();
+                //AddSettingsButton();
             });
         }
 
@@ -174,73 +173,9 @@ namespace PCHardwareMonitor
                     break;
                 default: break;
             }
-            if (settingsButton != null) { SetSettingsButtonPosition(position); }
         }
 
-        private void AddSettingsButton()
-        {
-            var rectangle = new RectangleGeometry();
-            rectangle.RadiusX = 5.0;
-            rectangle.RadiusY = 5.0;
-            rectangle.Rect = new Rect(new Point(0, 0), new Size(30.0, 30.0));
-            settingsButton = new Button();
-            settingsButton.Width = 30.0;
-            settingsButton.Height = 30.0;
-            settingsButton.Background = new SolidColorBrush(Color.FromArgb((byte)1, (byte)45, (byte)45, (byte)45));
-            settingsButton.ClipToBounds = true;
-            settingsButton.Clip = rectangle;
-            settingsButton.BorderThickness = new Thickness(0);
-            SetSettingsButtonPosition(currentPosition);
-            settingsButton.Click += (object sender, RoutedEventArgs e) => {
-                ShowSettingsWindow();
-                settingsButton.IsEnabled = false;
-            };
-            this.parent.MouseLeave += (object sender, MouseEventArgs e) => {
-                if (this.parent.IsMouseOver == false)
-                {
-                    System.Threading.Thread.Sleep(1000);
-                    settingsButton.Background = new SolidColorBrush(Color.FromArgb((byte)1, (byte)45, (byte)45, (byte)45));
-                }
-            };
-            this.parent.MouseEnter += (object sender, MouseEventArgs e) => {
-                settingsButton.Background = new SolidColorBrush(Color.FromArgb((byte)255, (byte)45, (byte)45, (byte)45));
-            };
-            root.Children.Add(settingsButton);
-        }
-        private void SetSettingsButtonPosition(LayoutPosition position)
-        {
-            switch (position)
-            {
-                case LayoutPosition.TopRight:
-                    settingsButton.Margin = new Thickness(0, 100, 60, 0);
-                    settingsButton.HorizontalAlignment = HorizontalAlignment.Left;
-                    settingsButton.VerticalAlignment = VerticalAlignment.Top;
-                    break;
-                case LayoutPosition.TopLeft:
-                    settingsButton.Margin = new Thickness(60, 100, 0, 0);
-                    settingsButton.HorizontalAlignment = HorizontalAlignment.Right;
-                    settingsButton.VerticalAlignment = VerticalAlignment.Top;
-                    break;
-                case LayoutPosition.BottomRight:
-                    settingsButton.Margin = new Thickness(0, 0, 60, 100);
-                    settingsButton.HorizontalAlignment = HorizontalAlignment.Left;
-                    settingsButton.VerticalAlignment = VerticalAlignment.Bottom;
-                    break;
-                case LayoutPosition.BottomLeft:
-                    settingsButton.Margin = new Thickness(60, 0, 0, 100);
-                    settingsButton.HorizontalAlignment = HorizontalAlignment.Right;
-                    settingsButton.VerticalAlignment = VerticalAlignment.Bottom;
-                    break;
-                case LayoutPosition.Center:
-                    settingsButton.Margin = new Thickness(60, 0, 0, 100);
-                    settingsButton.HorizontalAlignment = HorizontalAlignment.Right;
-                    settingsButton.VerticalAlignment = VerticalAlignment.Center;
-                    break;
-                default: break;
-            }
-        }
-
-        private void ShowSettingsWindow()
+        public void ShowSettingsWindow()
         {
             var window = new Window();
             window.Width = 600.0;
@@ -249,8 +184,11 @@ namespace PCHardwareMonitor
             var settings = new string[] { "Hardware", "Window Background Color", "Bar Background Color", "Bar Foreground Color", "Border Color", "Font", "Position", "Reset" };
             var settingsPanel = new SettingsPanel(settings);
             var handler = new SettingsHandler(settingsPanel);
-            window.Closed += (object sender, EventArgs e) => { handler.Dispose(); settingsButton.IsEnabled = true; };
+            window.Closed += (object sender, EventArgs e) => { handler.Dispose(); };
             handler.Delegate = this;
+            Uri iconUri = new Uri("pack://application:,,,/heart.ico", UriKind.RelativeOrAbsolute);
+            window.Title = "PC Hardware Monitor Settings";
+            window.Icon = System.Windows.Media.Imaging.BitmapFrame.Create(iconUri);
             window.Content = settingsPanel;
             window.Show();
         }

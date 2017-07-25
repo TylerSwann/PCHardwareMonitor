@@ -23,12 +23,14 @@ namespace PCHardwareMonitor
             this.indicator = indicator;
             this.monitoringVital = monitoringVital;
             var windowBlur = new WindowBlur(this);
+            Uri iconUri = new Uri("pack://application:,,,/heart.ico", UriKind.RelativeOrAbsolute);
             this.ShowInTaskbar = false;
             this.Content = indicator;
             this.Background = new SolidColorBrush(Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255)); ;
             this.MouseDown += (object sender, MouseButtonEventArgs e) => { this.DragMove(); };
             this.Loaded += (object sender, RoutedEventArgs e) => { windowBlur.Apply(); };
             this.Title = monitoringVital.ToString();
+            this.Icon = System.Windows.Media.Imaging.BitmapFrame.Create(iconUri);
         }
 
         public void SetBarBackgroundColor(Color color) { this.indicator.indicator.SetBarBackgroundColor(color); }

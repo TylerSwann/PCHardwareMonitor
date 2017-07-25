@@ -26,15 +26,19 @@ namespace PCHardwareMonitor
             VitalMonitor.currentPC.HDDEnabled = true;
             VitalMonitor.currentPC.RAMEnabled = true;
             VitalMonitor.currentPC.MainboardEnabled = true;
+            Uri iconUri = new Uri("pack://application:,,,/heart.ico", UriKind.RelativeOrAbsolute);
             this.AllowsTransparency = true;
             this.WindowStyle = WindowStyle.None;
             this.Background = new SolidColorBrush(Color.FromArgb((byte)1, (byte)255, (byte)255, (byte)255));
             this.ShowInTaskbar = false;
             this.Title = "PC Hardware Monitor";
+            this.Icon = System.Windows.Media.Imaging.BitmapFrame.Create(iconUri);
             ReadSettings();
             manager = new WindowManager(this.settings, this, this.root);
             manager.Open();
         }
+
+        public void ShowSettingsWindow() { manager.ShowSettingsWindow(); }
 
         private void ReadSettings()
         {

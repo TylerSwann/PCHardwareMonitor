@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using Newtonsoft.Json;
 
@@ -150,7 +149,6 @@ namespace PCHardwareMonitor
                     if (checkbox.IsChecked ?? false) { vitalsToMonitor.Add(vital); this.Delegate.DidSelectNewVital(vital, true); }
                     else { if (vitalsToMonitor.Contains(vital)) { vitalsToMonitor.Remove(vital); this.Delegate.DidSelectNewVital(vital, false); } }
                     settings.startupVitals = vitalsToMonitor.ToArray();
-                    Console.WriteLine(vital.ToString() + " " + checkbox.IsChecked);
                 };
                 hardwareMenu.Children.Add(checkbox);
             }

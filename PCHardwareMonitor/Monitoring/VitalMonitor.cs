@@ -96,7 +96,7 @@ namespace PCHardwareMonitor
             var text = (string)indicator.label.Content;
             Action task = () => {
                 var tempf = gpuReport.tempFahrenheit;
-                var tempPercent = ((tempf / 220) * 100);
+                var tempPercent = ((tempf / 200.0) * 100);
                 var usageText = text + tempf + "F";
                 Action updateUI = () => { indicator.UpdateIndicator(usageText, tempPercent); };
                 indicator.Dispatcher.Invoke(updateUI);
@@ -121,8 +121,8 @@ namespace PCHardwareMonitor
             var text = (string)indicator.label.Content;
             Action task = () => {
                 var usage = gpuReport.fanSpeed;
-                var usagePercent = (gpuReport.fanSpeed / 100);
-                var usageText = text+ usage + " RPM";
+                var usagePercent = (((double)gpuReport.fanSpeed / 4000.0) * 100.0);
+                var usageText = text + usage + " RPM";
                 Action updateUI = () => { indicator.UpdateIndicator(usageText, usagePercent); };
                 indicator.Dispatcher.Invoke(updateUI);
             };
@@ -147,13 +147,7 @@ namespace PCHardwareMonitor
         {
             var driveLabel = drive.Name;
             driveLabel = driveLabel.Replace(@":\", "") + " :    ";
-
-            long driveCapacity = drive.TotalSize;
-            long freeSpace = drive.TotalFreeSpace;
-            var usedSpace = ((double)driveCapacity - (double)freeSpace);
-            var decimalPercentUsed = ((((double)usedSpace / (double)driveCapacity) * 100) - 100);
-            var percentUsed = (int)Math.Abs(decimalPercentUsed);
-
+            var percentUsed = Math.Abs((((100 * drive.AvailableFreeSpace / drive.TotalSize)) - 100));
             Action task = () => {
                 var usedText = driveLabel + percentUsed + "%";
                 Action updateUI = () => { indicator.UpdateIndicator(usedText, percentUsed); };

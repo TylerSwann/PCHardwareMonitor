@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using PCHardwareMonitor.IndicatorTheming;
 
@@ -24,7 +23,6 @@ namespace PCHardwareMonitor
             this.ShowInTaskbar = false;
             this.Content = indicator;
             this.Background = new SolidColorBrush(Color.FromArgb((byte)30, (byte)255, (byte)255, (byte)255)); ;
-            this.MouseDown += (object sender, MouseButtonEventArgs e) => { this.DragMove(); };
             this.Loaded += (object sender, RoutedEventArgs e) => { windowBlur.Apply(); };
             this.Title = monitoringVital.ToString();
             this.Icon = System.Windows.Media.Imaging.BitmapFrame.Create(iconUri);

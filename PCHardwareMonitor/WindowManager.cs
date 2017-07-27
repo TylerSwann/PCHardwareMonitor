@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
 
@@ -201,15 +200,19 @@ namespace PCHardwareMonitor
             {
                 case SettingsOption.WindowBackgroundColor:
                     foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.Background = new SolidColorBrush(color); }
+                    settings.windowBackgroundColor = color;
                     break;
                 case SettingsOption.BarBackgroundColor:
                     foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.SetBarBackgroundColor(color); }
+                    settings.barBackgroundColor = color;
                     break;
                 case SettingsOption.BarForegroundColor:
                     foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.SetBarForegroundColor(color); }
+                    settings.barForegroundColor = color;
                     break;
                 case SettingsOption.BorderColor:
                     foreach (var indicatorWindow in indicatorWindows) { indicatorWindow.SetBorderBrushColor(color); }
+                    settings.borderColor = color;
                     break;
                 default: break;
             }
@@ -245,6 +248,7 @@ namespace PCHardwareMonitor
                     if (indicatorWindow.monitoringVital == vital) { indicatorWindow.Show(); }
                     indicatorWindow.Opacity = 1.0;
                 }
+                ApplySettings();
             }
             else
             {

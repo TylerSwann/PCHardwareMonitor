@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
 
@@ -42,20 +38,25 @@ namespace PCHardwareMonitor
 
         private void ReadSettings()
         {
-            if (Directory.Exists(AppDirectory.rootDirectory) == false) { Directory.CreateDirectory(AppDirectory.rootDirectory); }
-            if (File.Exists(AppDirectory.defaultSettings) == false) { UserSettings.defaults.WriteToFile(AppDirectory.defaultSettings); }
-            if (File.Exists($"{AppDirectory.rootDirectory}/user.json") == false)
+            try
             {
-                try { this.settings = UserSettings.LoadFromFile(AppDirectory.defaultSettings); }
-                catch (System.Exception ex) { Console.WriteLine(ex); }
-                return;
+                if (Directory.Exists(AppDirectory.rootDirectory) == false) { Directory.CreateDirectory(AppDirectory.rootDirectory); }
+                if (File.Exists(AppDirectory.defaultSettings) == false) { UserSettings.defaults.WriteToFile(AppDirectory.defaultSettings); }
+                if (File.Exists($"{AppDirectory.rootDirectory}/user.json") == false)
+                {
+                    try { this.settings = UserSettings.LoadFromFile(AppDirectory.defaultSettings); }
+                    catch (System.Exception ex) { Console.WriteLine(ex); }
+                    return;
+                }
+                else
+                {
+                    try { this.settings = UserSettings.LoadFromFile(AppDirectory.userSettings); }
+                    catch (System.Exception ex) { Console.WriteLine(ex); }
+                }
+                if (settings == null) { Console.WriteLine("SETTINGS IS NULL"); }
             }
-            else
-            {
-                try { this.settings = UserSettings.LoadFromFile(AppDirectory.userSettings); }
-                catch (System.Exception ex) { Console.WriteLine(ex); }
-            }
-            if (settings == null) { Console.WriteLine("SETTINGS IS NULL"); }
+            catch (System.IO.IOException exc) { Console.WriteLine(exc); }
+            catch (System.Exception exc) { Console.WriteLine(exc); }
         }
     }
 }

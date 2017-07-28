@@ -15,7 +15,6 @@ namespace PCHardwareMonitor
 
     class SettingsHandler: IDisposable
     {
-        private string[] optionTitles = new string[] { "Hardware", "Window Background Color", "Bar Background Color", "Bar Foreground Color", "Border Color", "Font", "Position" };
         private string[] hardwareVitalTitles = new string[] { "GPU Temp", "GPU Fan RPM", "GPU Usage", "GPU Memory Usage", "CPU Usage", "RAM Usage", "Harddrive Space"};
         private string[] positionTitles = new string[] { "Top Right", "Top Left", "Bottom Right", "Bottom Left", "Center" };
         private List<string> fontFamilies = new List<string>();
